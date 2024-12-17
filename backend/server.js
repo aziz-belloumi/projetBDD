@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql2");
+const { Client } = require("pg"); // Import PostgreSQL client
 const cors = require("cors");
 
 const app = express();
@@ -10,139 +10,130 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-const db = mysql.createConnection({
+const db = new Client({
   host: "localhost",
-  user: "root", // Update with your MySQL username
-  password: "", // Update with your MySQL password
-  database: "zoo_management",
+  user: "postgres", // Update with your PostgreSQL username
+  password: "aziz1234", // Update with your PostgreSQL password
+  database: "zoo", // Your PostgreSQL database name
 });
 
 db.connect((err) => {
   if (err) throw err;
-  console.log("Connected to MySQL Database!");
+  console.log("Connected to PostgreSQL Database!");
 });
 
-// ------------------ Employees ------------------
+// ------------------ Employe ------------------
 // Fetch all employees
-app.get("/api/employees", (req, res) => {
-  db.query("SELECT * FROM Employe", (err, results) => {
+app.get("/api/employes", (req, res) => {
+  db.query("SELECT * FROM employe", (err, results) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(results.rows); // Use results.rows in PostgreSQL
   });
 });
 
-// Add a new employee
-app.post("/api/employees", (req, res) => {
+// Add a new employe
+app.post("/api/employes", (req, res) => {
   console.log("Incoming Data:", req.body);
 
   const {
-    code_employe,
+    codeemploye,
     nom,
     prenom,
-    date_naissance,
-    lieu_naissance,
+    datenaissance,
+    lieunaissance,
     adresse,
-    numero_telephone,
-    numero_AVS,
-    nom_marital,
-    service_id,
-    taux_occupation,
-    grade,
+    numerotelephone,
+    numeroAVS,
+    nommarital,
+    typeservice,
+    poste,
   } = req.body;
 
   const query = `
-    INSERT INTO Employe (
-      code_employe, nom, prenom, date_naissance, lieu_naissance,
-      adresse, numero_telephone, numero_AVS, nom_marital, 
-      service_id, taux_occupation, grade
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO employe (
+      codeemploye, nom, prenom, datenaissance, lieunaissance,
+      adresse, numerotelephone, numeroAVS, nommarital, 
+      typeservice, poste
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING *;  -- Return the inserted row
   `;
 
   db.query(
     query,
     [
-      code_employe,
+      codeemploye,
       nom,
       prenom,
-      date_naissance || null,
-      lieu_naissance || null,
+      datenaissance || null,
+      lieunaissance || null,
       adresse || null,
-      numero_telephone || null,
-      numero_AVS || null,
-      nom_marital || null,
-      service_id || null,
-      taux_occupation || null,
-      grade || null,
+      numerotelephone || null,
+      numeroAVS || null,
+      nommarital || null,
+      typeservice || null,
+      poste || null,
     ],
     (err, result) => {
       if (err) {
         console.error("Error executing query:", err.message);
         return res.status(500).json({ error: err.message });
       }
-      res.json({ message: "Employee added successfully!", result });
+      res.json({ message: "Employe added successfully!", result: result.rows[0] });
     }
   );
 });
 
-// ------------------ Services ------------------
+
+// ------------------ Service ------------------
 // Fetch all services
 app.get("/api/services", (req, res) => {
-  db.query("SELECT * FROM Service", (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results);
+  db.query("SELECT * FROM service", (err, results) => {
+    if (err) {
+      console.error("Error fetching services:", err.message);
+      return res.status(500).send(err);
+    }
+    res.json(results.rows); // Return the data from PostgreSQL
   });
 });
 
-// Add a new service
-app.post("/api/services", (req, res) => {
-  const { nom_service } = req.body;
-  db.query(
-    "INSERT INTO Service (nom_service) VALUES (?)",
-    [nom_service],
-    (err) => {
-      if (err) return res.status(500).send(err);
-      res.json({ message: "Service added successfully!" });
-    }
-  );
-});
 
-// ------------------ Secteurs ------------------
+// ------------------ Secteur ------------------
 // Fetch all secteurs
 app.get("/api/secteurs", (req, res) => {
-  db.query("SELECT * FROM Secteur", (err, results) => {
+  db.query("SELECT * FROM secteur", (err, results) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(results.rows); // Use results.rows in PostgreSQL
   });
 });
 
 // Add a new secteur
 app.post("/api/secteurs", (req, res) => {
-  const { nom_secteur, fonction, chef_secteur } = req.body;
+  const { nomsecteur, description, codechef } = req.body;
   db.query(
-    "INSERT INTO Secteur (nom_secteur, fonction, chef_secteur) VALUES (?, ?, ?)",
-    [nom_secteur, fonction, chef_secteur],
-    (err) => {
+    "INSERT INTO secteur (nom_secteur, description, code_chef) VALUES ($1, $2, $3) RETURNING *",
+    [nomsecteur, description, codechef],
+    (err, result) => {
       if (err) return res.status(500).send(err);
-      res.json({ message: "Secteur added successfully!" });
+      res.json({ message: "Secteur added successfully!", secteur: result.rows[0] });
     }
   );
 });
 
-// ------------------ Parcelles ------------------
+// ------------------ Parcelle ------------------
 // Fetch all parcelles
 app.get("/api/parcelles", (req, res) => {
-  db.query("SELECT * FROM Parcelle", (err, results) => {
+  db.query("SELECT * FROM parcelle", (err, results) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(results.rows); // Use results.rows in PostgreSQL
   });
 });
 
-// ------------------ Animals ------------------
+// ------------------ Animal ------------------
 // Fetch all animals
-app.get("/api/animals", (req, res) => {
-  db.query("SELECT * FROM Animal", (err, results) => {
+app.get("/api/animaux", (req, res) => {
+  db.query("SELECT * FROM animal", (err, results) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(results.rows); // Use results.rows in PostgreSQL
   });
 });
 

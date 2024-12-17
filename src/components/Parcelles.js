@@ -10,7 +10,7 @@ function Parcelles() {
 
   const fetchParcelles = () => {
     axios
-      .get("http://localhost:5000/api/parcelles")
+      .get("http://localhost:5000/api/parcelles") // Adjusted endpoint to fetch parcelles
       .then((res) => setParcelles(res.data));
   };
 
@@ -21,15 +21,15 @@ function Parcelles() {
       <table border="1">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Secteur ID</th>
+            <th>ID Parcelle</th> {/* Updated header */}
+            <th>Secteur ID</th> {/* Updated header */}
           </tr>
         </thead>
         <tbody>
           {parcelles.map((parcelle) => (
-            <tr key={parcelle.id_parcelle}>
-              <td>{parcelle.id_parcelle}</td>
-              <td>{parcelle.id_secteur}</td>
+            <tr key={parcelle.idparcelle}> {/* Updated key to match the column name */}
+              <td>{parcelle.idparcelle}</td> {/* Updated to match 'idparcelle' */}
+              <td>{parcelle.idsecteur}</td> {/* Updated to match 'idsecteur' */}
             </tr>
           ))}
         </tbody>

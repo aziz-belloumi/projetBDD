@@ -4,25 +4,25 @@ import axios from "axios";
 function Employees() {
   const [employees, setEmployees] = useState([]);
   const [formData, setFormData] = useState({
-    code_employe: "",
+    codeemploye: "",
     nom: "",
     prenom: "",
-    date_naissance: "",
-    lieu_naissance: "",
+    datenaissance: "",
+    lieunaissance: "",
     adresse: "",
-    numero_telephone: "",
-    numero_AVS: "",
-    nom_marital: "",
-    service_id: "",
-    taux_occupation: "",
-    grade: "",
+    numerotelephone: "",
+    numeroAVS: "",
+    nommarital: "",
+    typeservice: "", // Updated to match PostgreSQL column 'TypeService'
+    poste: "",
   });
 
   // Fetch employees
   useEffect(() => {
-    axios.get("http://localhost:5000/api/employees").then((res) => {
-      setEmployees(res.data);
-    });
+    axios.get("http://localhost:5000/api/employes") // Adjusted the endpoint for 'employes'
+      .then((res) => {
+        setEmployees(res.data);
+      });
   }, []);
 
   // Handle input changes
@@ -37,7 +37,7 @@ function Employees() {
     console.log("Form Data:", formData); // Verify form data before sending
 
     axios
-      .post("http://localhost:5000/api/employees", formData)
+      .post("http://localhost:5000/api/employes", formData)
       .then(() => {
         alert("Employee added successfully!");
         window.location.reload();
@@ -54,7 +54,7 @@ function Employees() {
       {/* Form to Add Employee */}
       <form onSubmit={handleSubmit}>
         <input
-          name="code_employe"
+          name="codeemploye"
           placeholder="Code Employe"
           onChange={handleChange}
           required
@@ -67,47 +67,44 @@ function Employees() {
           required
         />
         <input
-          name="date_naissance"
+          name="datenaissance"
           placeholder="Date de Naissance"
           type="date"
           onChange={handleChange}
         />
         <input
-          name="lieu_naissance"
+          name="lieunaissance"
           placeholder="Lieu de Naissance"
           onChange={handleChange}
         />
         <input name="adresse" placeholder="Adresse" onChange={handleChange} />
         <input
-          name="numero_telephone"
+          name="numerotelephone"
           placeholder="Numéro de Téléphone"
           onChange={handleChange}
         />
         <input
-          name="numero_AVS"
+          name="numeroAVS"
           placeholder="Numéro AVS"
           onChange={handleChange}
         />
         <input
-          name="nom_marital"
+          name="nommarital"
           placeholder="Nom Marital"
           onChange={handleChange}
         />
         <input
-          name="service_id"
-          placeholder="Service ID"
-          type="number"
+          name="typeservice"
+          placeholder="Type de Service (Administratif, Surveillance, Medical)"
           onChange={handleChange}
           required
         />
         <input
-          name="taux_occupation"
-          placeholder="Taux Occupation"
-          type="number"
-          step="0.01"
+          name="poste"
+          placeholder="Poste"
           onChange={handleChange}
+          required
         />
-        <input name="grade" placeholder="Grade" onChange={handleChange} />
         <button type="submit">Add Employee</button>
       </form>
 
@@ -126,25 +123,23 @@ function Employees() {
             <th>AVS</th>
             <th>Nom Marital</th>
             <th>Service</th>
-            <th>Taux Occupation</th>
-            <th>Grade</th>
+            <th>Poste</th>
           </tr>
         </thead>
         <tbody>
           {employees.map((emp) => (
             <tr key={emp.code_employe}>
-              <td>{emp.code_employe}</td>
+              <td>{emp.codeemploye}</td>
               <td>{emp.nom}</td>
               <td>{emp.prenom}</td>
-              <td>{emp.date_naissance || "N/A"}</td>
-              <td>{emp.lieu_naissance || "N/A"}</td>
+              <td>{emp.datenaissance || "N/A"}</td>
+              <td>{emp.lieunaissance || "N/A"}</td>
               <td>{emp.adresse || "N/A"}</td>
-              <td>{emp.numero_telephone || "N/A"}</td>
-              <td>{emp.numero_AVS || "N/A"}</td>
-              <td>{emp.nom_marital || "N/A"}</td>
-              <td>{emp.service_id}</td>
-              <td>{emp.taux_occupation || "N/A"}</td>
-              <td>{emp.grade || "N/A"}</td>
+              <td>{emp.numerotelephone || "N/A"}</td>
+              <td>{emp.numeroavs || "N/A"}</td>
+              <td>{emp.nommarital || "N/A"}</td>
+              <td>{emp.typeservice || "N/A"}</td>
+              <td>{emp.poste || "N/A"}</td>
             </tr>
           ))}
         </tbody>
