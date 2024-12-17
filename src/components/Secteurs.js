@@ -4,9 +4,9 @@ import axios from "axios";
 function Secteurs() {
   const [secteurs, setSecteurs] = useState([]);
   const [formData, setFormData] = useState({
-    nomsecteur: "",
-    description: "", // Adjusted for 'description' column
-    codechef: "", // Adjusted for 'CodeChef' (foreign key to Employe)
+    NomSecteur: "",
+    Description: "",
+    CodeChef: "", 
   });
 
   useEffect(() => {
@@ -15,21 +15,20 @@ function Secteurs() {
 
   const fetchSecteurs = () => {
     axios
-      .get("http://localhost:5000/api/secteurs") // Ensure the correct endpoint for fetching secteurs
+      .get("http://localhost:5000/api/secteurs")
       .then((res) => setSecteurs(res.data));
   };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api/secteurs", formData) // Corrected the POST request to match schema
+      .post("http://localhost:5000/api/secteurs", formData)
       .then(() => {
-        fetchSecteurs();
-        alert("Secteur added!");
+        fetchSecteurs(); // Refresh data
+        alert("Secteur added successfully!");
+      })
+      .catch((error) => {
+        console.error("Error adding secteur:", error.response || error.message);
+        alert("Failed to add secteur. Please check your input and try again.");
       });
   };
 
@@ -38,22 +37,34 @@ function Secteurs() {
       <h2>Secteurs</h2>
       <form onSubmit={handleSubmit}>
         <input
-          name="nom_secteur"
-          placeholder="Nom Secteur"
-          onChange={handleChange}
-          required
+          type="text"
+          name="NomSecteur"
+          placeholder="Nom du Secteur"
+          value={formData.NomSecteur}
+          onChange={(e) =>
+            setFormData({ ...formData, NomSecteur: e.target.value })
+          }
         />
-        <input
-          name="description"
+
+        <textarea
+          name="Description"
           placeholder="Description"
-          onChange={handleChange}
+          value={formData.Description}
+          onChange={(e) =>
+            setFormData({ ...formData, Description: e.target.value })
+          }
         />
+
         <input
-          name="code_chef"
-          placeholder="Chef Secteur Code"
-          onChange={handleChange}
-          required
+          type="text"
+          name="CodeChef"
+          placeholder="Code Chef"
+          value={formData.CodeChef}
+          onChange={(e) =>
+            setFormData({ ...formData, CodeChef: e.target.value })
+          }
         />
+
         <button type="submit">Add</button>
       </form>
 
@@ -69,7 +80,9 @@ function Secteurs() {
         </thead>
         <tbody>
           {secteurs.map((sec) => (
-            <tr key={sec.idsecteur}> {/* Fixed the 'id_secteur' to 'idsecteur' */}
+            <tr key={sec.idsecteur}>
+              {" "}
+              {/* Fixed the 'id_secteur' to 'idsecteur' */}
               <td>{sec.idsecteur}</td> {/* Updated to match 'idsecteur' */}
               <td>{sec.nomsecteur}</td> {/* Updated to match 'nomsecteur' */}
               <td>{sec.description}</td> {/* Added description column */}

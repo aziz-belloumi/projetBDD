@@ -13,7 +13,7 @@ app.use(express.json());
 const db = new Client({
   host: "localhost",
   user: "postgres", // Update with your PostgreSQL username
-  password: "aziz1234", // Update with your PostgreSQL password
+  password: "fedikh09", // Update with your PostgreSQL password
   database: "zoo", // Your PostgreSQL database name
 });
 
@@ -78,11 +78,13 @@ app.post("/api/employes", (req, res) => {
         console.error("Error executing query:", err.message);
         return res.status(500).json({ error: err.message });
       }
-      res.json({ message: "Employe added successfully!", result: result.rows[0] });
+      res.json({
+        message: "Employe added successfully!",
+        result: result.rows[0],
+      });
     }
   );
 });
-
 
 // ------------------ Service ------------------
 // Fetch all services
@@ -96,7 +98,6 @@ app.get("/api/services", (req, res) => {
   });
 });
 
-
 // ------------------ Secteur ------------------
 // Fetch all secteurs
 app.get("/api/secteurs", (req, res) => {
@@ -107,16 +108,20 @@ app.get("/api/secteurs", (req, res) => {
 });
 
 // Add a new secteur
-app.post("/api/secteurs", (req, res) => {
-  const { nomsecteur, description, codechef } = req.body;
-  db.query(
-    "INSERT INTO secteur (nom_secteur, description, code_chef) VALUES ($1, $2, $3) RETURNING *",
-    [nomsecteur, description, codechef],
-    (err, result) => {
-      if (err) return res.status(500).send(err);
-      res.json({ message: "Secteur added successfully!", secteur: result.rows[0] });
-    }
-  );
+app.post("/api/secteurs", async (req, res) => {
+  const { NomSecteur, Description, CodeChef } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO Secteur (NomSecteur, Description, CodeChef) 
+      VALUES ($1, $2, $3)
+    `;
+    await db.query(query, [NomSecteur, Description, CodeChef || null]);
+    res.status(201).json({ message: "Secteur added successfully!" });
+  } catch (error) {
+    console.error("Error adding secteur:", error.message);
+    res.status(500).json({ error: "Failed to add secteur" });
+  }
 });
 
 // ------------------ Parcelle ------------------
@@ -127,6 +132,21 @@ app.get("/api/parcelles", (req, res) => {
     res.json(results.rows); // Use results.rows in PostgreSQL
   });
 });
+app.post("/api/parcelles", async (req, res) => {
+  const { IDSecteur, NumeroParcelle } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO Parcelle (IDSecteur, NumeroParcelle) 
+      VALUES ($1, $2) RETURNING *;
+    `;
+    const result = await db.query(query, [IDSecteur, NumeroParcelle]);
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error adding parcelle:", error.message);
+    res.status(500).json({ error: "Failed to add parcelle" });
+  }
+});
 
 // ------------------ Animal ------------------
 // Fetch all animals
@@ -135,6 +155,45 @@ app.get("/api/animaux", (req, res) => {
     if (err) return res.status(500).send(err);
     res.json(results.rows); // Use results.rows in PostgreSQL
   });
+});
+app.post("/api/animals", async (req, res) => {
+  const {
+    Nom,
+    Espece,
+    DateNaissance,
+    Poids,
+    Taille,
+    GroupeSanguin,
+    IDPere,
+    IDMere,
+    DateDeces,
+    IDParcelle,
+  } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO Animal 
+      (Nom, Espece, DateNaissance, Poids, Taille, GroupeSanguin, IDPere, IDMere, DateDeces, IDParcelle)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+
+    await db.query(query, [
+      Nom || null,
+      Espece,
+      DateNaissance || null,
+      Poids || null,
+      Taille || null,
+      GroupeSanguin || null,
+      IDPere || null,
+      IDMere || null,
+      DateDeces || null,
+      IDParcelle,
+    ]);
+
+    res.status(201).json({ message: "Animal added successfully!" });
+  } catch (error) {
+    console.error("Database Error:", error.message);
+    res.status(500).json({ error: "Failed to add animal" });
+  }
 });
 
 // Start Server
