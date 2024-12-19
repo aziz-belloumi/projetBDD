@@ -1,92 +1,120 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function Secteurs() {
   const [secteurs, setSecteurs] = useState([]);
   const [formData, setFormData] = useState({
+    IDSecteur: "",
     NomSecteur: "",
-    Description: "",
-    CodeChef: "", 
+    IDChefDeSecteur: "",
   });
 
+  // Fonction pour récupérer les secteurs (GET)
+  const fetchSecteurs = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/secteurs");
+      setSecteurs(response.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des secteurs :",
+        error.message
+      );
+    }
+  };
+
+  // Fonction pour ajouter un secteur (POST)
+  const addSecteur = async (e) => {
+    e.preventDefault();
+
+    // Validation simple
+    if (
+      !formData.IDSecteur ||
+      !formData.NomSecteur ||
+      !formData.IDChefDeSecteur
+    ) {
+      alert("Tous les champs sont requis !");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/secteurs",
+        formData
+      );
+      alert(response.data.message);
+      setFormData({ IDSecteur: "", NomSecteur: "", IDChefDeSecteur: "" }); // Réinitialiser le formulaire
+      fetchSecteurs(); // Rafraîchir la liste des secteurs
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du secteur :", error.message);
+    }
+  };
+
+  // Mettre à jour les champs du formulaire
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Charger les secteurs au premier rendu
   useEffect(() => {
     fetchSecteurs();
   }, []);
 
-  const fetchSecteurs = () => {
-    axios
-      .get("http://localhost:5000/api/secteurs")
-      .then((res) => setSecteurs(res.data));
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post("http://localhost:5000/api/secteurs", formData)
-      .then(() => {
-        fetchSecteurs(); // Refresh data
-        alert("Secteur added successfully!");
-      })
-      .catch((error) => {
-        console.error("Error adding secteur:", error.response || error.message);
-        alert("Failed to add secteur. Please check your input and try again.");
-      });
-  };
-
   return (
     <div>
-      <h2>Secteurs</h2>
-      <form onSubmit={handleSubmit}>
+      <h1>Gestion des Secteurs</h1>
+
+      {/* Formulaire pour ajouter un secteur */}
+      <h2>Ajouter un Secteur</h2>
+      <form onSubmit={addSecteur} style={{ marginBottom: "20px" }}>
+        <input
+          type="number"
+          name="IDSecteur"
+          placeholder="ID Secteur"
+          value={formData.IDSecteur}
+          onChange={handleChange}
+          required
+          style={{ marginRight: "10px", padding: "5px" }}
+        />
         <input
           type="text"
           name="NomSecteur"
           placeholder="Nom du Secteur"
           value={formData.NomSecteur}
-          onChange={(e) =>
-            setFormData({ ...formData, NomSecteur: e.target.value })
-          }
+          onChange={handleChange}
+          required
+          style={{ marginRight: "10px", padding: "5px" }}
         />
-
-        <textarea
-          name="Description"
-          placeholder="Description"
-          value={formData.Description}
-          onChange={(e) =>
-            setFormData({ ...formData, Description: e.target.value })
-          }
-        />
-
         <input
           type="text"
-          name="CodeChef"
-          placeholder="Code Chef"
-          value={formData.CodeChef}
-          onChange={(e) =>
-            setFormData({ ...formData, CodeChef: e.target.value })
-          }
+          name="IDChefDeSecteur"
+          placeholder="ID Chef de Secteur"
+          value={formData.IDChefDeSecteur}
+          onChange={handleChange}
+          required
+          style={{ marginRight: "10px", padding: "5px" }}
         />
-
-        <button type="submit">Add</button>
+        <button type="submit" style={{ padding: "5px 10px" }}>
+          Ajouter
+        </button>
       </form>
 
-      <h3>Secteur List</h3>
-      <table border="1">
+      {/* Tableau pour afficher les secteurs */}
+      <h2>Liste des Secteurs</h2>
+      <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Description</th> {/* Updated column header */}
-            <th>Chef Secteur</th> {/* Updated to match the 'CodeChef' column */}
+            <th>ID Secteur</th>
+            <th>Nom Secteur</th>
+            <th>ID Chef de Secteur</th>
           </tr>
         </thead>
         <tbody>
-          {secteurs.map((sec) => (
-            <tr key={sec.idsecteur}>
-              {" "}
-              {/* Fixed the 'id_secteur' to 'idsecteur' */}
-              <td>{sec.idsecteur}</td> {/* Updated to match 'idsecteur' */}
-              <td>{sec.nomsecteur}</td> {/* Updated to match 'nomsecteur' */}
-              <td>{sec.description}</td> {/* Added description column */}
-              <td>{sec.codechef}</td> {/* Updated to match 'codechef' */}
+          {secteurs.map((secteur) => (
+            <tr key={secteur.idsecteur}>
+              <td style={{ padding: "8px" }}>{secteur.idsecteur}</td>
+              <td style={{ padding: "8px" }}>{secteur.nomsecteur}</td>
+              <td style={{ padding: "8px" }}>{secteur.idchefdesecteur}</td>
             </tr>
           ))}
         </tbody>

@@ -4,6 +4,8 @@ import Employees from "./components/Employees";
 import Secteurs from "./components/Secteurs";
 import Parcelles from "./components/Parcelles";
 import Animals from "./components/Animals";
+import Emploidutempcommun from "./components/Emploidutempcommun";
+import Emploidutempsindiv from "./components/Emploidutempsindiv";
 
 function App() {
   return (
@@ -24,6 +26,12 @@ function App() {
             <li>
               <Link to="/animals">Animals</Link>
             </li>
+            <li>
+              <Link to="/emploicommun">Emploicommun</Link>
+            </li>
+            <li>
+              <Link to="/emploiindiv">Emploiindiv</Link>
+            </li>
           </ul>
         </nav>
         <Routes>
@@ -31,6 +39,8 @@ function App() {
           <Route path="/secteurs" element={<Secteurs />} />
           <Route path="/parcelles" element={<Parcelles />} />
           <Route path="/animals" element={<Animals />} />
+          <Route path="/emploicommun" element={<Emploidutempcommun />} />
+          <Route path="/emploiindiv" element={<Emploidutempsindiv />} />
         </Routes>
       </div>
     </Router>
