@@ -6,6 +6,7 @@ import Parcelles from "./components/Parcelles";
 import Animals from "./components/Animals";
 import Emploidutempcommun from "./components/Emploidutempcommun";
 import Emploidutempsindiv from "./components/Emploidutempsindiv";
+import Services from "./components/Servises";
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
           <ul>
             <li>
               <Link to="/employees">Employees</Link>
+            </li>
+            <li>
+              <Link to="/services">Services</Link>
             </li>
             <li>
               <Link to="/secteurs">Secteurs</Link>
@@ -41,6 +45,7 @@ function App() {
           <Route path="/animals" element={<Animals />} />
           <Route path="/emploicommun" element={<Emploidutempcommun />} />
           <Route path="/emploiindiv" element={<Emploidutempsindiv />} />
+          <Route path="/services" element={<Services />} />
         </Routes>
       </div>
     </Router>

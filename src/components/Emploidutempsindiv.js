@@ -1,63 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const Emploidutempsindiv = () => {
+function Emploidutempsindiv() {
   const [emplois, setEmplois] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("/emplois-du-temps"); // Appel à l'API avec Axios
-        console.log("Données reçues :", response.data); // Log des données
-        setEmplois(response.data); // Stocker les données dans l'état
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des emplois du temps :",
-          error
-        );
-      }
-    };
+  // Fonction pour récupérer tous les emplois
+  const fetchEmplois = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/emplois-tous-gardiens"
+      );
+      setEmplois(response.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des emplois :",
+        error.message
+      );
+    }
+  };
 
-    fetchData();
+  // Charger les emplois au premier rendu
+  useEffect(() => {
+    fetchEmplois();
   }, []);
 
   // Grouper les emplois par gardien
-  const emploisParGardien = emplois.reduce((acc, emploi) => {
-    if (!acc[emploi.nomgardien]) {
-      acc[emploi.nomgardien] = [];
-    }
-    acc[emploi.nomgardien].push(emploi);
-    return acc;
-  }, {});
+  const groupByGardien = (emplois) => {
+    return emplois.reduce((grouped, emploi) => {
+      const gardienId = emploi.idgardien;
+      if (!grouped[gardienId]) {
+        grouped[gardienId] = {
+          nom: `${emploi.nomgardien} ${emploi.prenomgardien}`,
+          emplois: [],
+        };
+      }
+      grouped[gardienId].emplois.push(emploi);
+      return grouped;
+    }, {});
+  };
+
+  const groupedEmplois = groupByGardien(emplois);
 
   return (
     <div>
-      <h1>Emplois du Temps des Gardiens</h1>
-      {Object.keys(emploisParGardien).length === 0 ? (
-        <p>Aucun emploi du temps à afficher.</p>
-      ) : (
-        Object.keys(emploisParGardien).map((gardien, index) => (
+      <h1>Emplois du Temps de Tous les Gardiens</h1>
+      {Object.keys(groupedEmplois).length > 0 ? (
+        Object.entries(groupedEmplois).map(([gardienId, data]) => (
           <div
-            key={index}
+            key={gardienId}
             style={{
               border: "1px solid black",
-              margin: "10px",
               padding: "10px",
-              borderRadius: "5px",
+              marginBottom: "20px",
             }}
           >
-            <h2>Emploi du temps de : {gardien}</h2>
-            {emploisParGardien[gardien].map((emploi, idx) => (
-              <p key={idx}>
-                <strong>{emploi.jour} :</strong> secteur {emploi.nomsecteur},
-                parcelles {emploi.parcelles}
-              </p>
-            ))}
+            <h2>Emploi du temps de : {data.nom}</h2>
+            <ul>
+              {data.emplois.map((emploi, index) => (
+                <li key={index}>
+                  <strong>{emploi.jour} :</strong> secteur {emploi.nomsecteur} :
+                  parcelles {emploi.parcelles.join(" - ")}
+                </li>
+              ))}
+            </ul>
           </div>
         ))
+      ) : (
+        <p>Aucun emploi du temps disponible.</p>
       )}
     </div>
   );
-};
+}
 
 export default Emploidutempsindiv;

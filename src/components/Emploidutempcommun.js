@@ -4,44 +4,34 @@ import axios from "axios";
 function Emploidutempcommun() {
   const [emplois, setEmplois] = useState({});
   const [formData, setFormData] = useState({
-    jour: "Lundi",
-    heure: "08:00",
+    jour: "",
+    heure: "",
     idParcelle: "",
     idSecteur: "",
     idGardien: "",
   });
 
-  // Fonction pour récupérer les emplois communs
+  // Fetch emplois commun
   const fetchEmplois = async () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/api/emplois-commun"
       );
-      const emploisOrganises = {};
-
-      // Organiser les emplois par secteur, jour et parcelle
-      response.data.forEach((emploi) => {
-        if (!emploisOrganises[emploi.nomsecteur]) {
-          emploisOrganises[emploi.nomsecteur] = {};
+      const groupedEmplois = response.data.reduce((acc, emploi) => {
+        if (!acc[emploi.nomsecteur]) {
+          acc[emploi.nomsecteur] = {};
         }
-        if (!emploisOrganises[emploi.nomsecteur][emploi.jour]) {
-          emploisOrganises[emploi.nomsecteur][emploi.jour] = {};
+        if (!acc[emploi.nomsecteur][emploi.jour]) {
+          acc[emploi.nomsecteur][emploi.jour] = {};
         }
-        if (
-          !emploisOrganises[emploi.nomsecteur][emploi.jour][emploi.idparcelle]
-        ) {
-          emploisOrganises[emploi.nomsecteur][emploi.jour][emploi.idparcelle] =
-            [];
+        if (!acc[emploi.nomsecteur][emploi.jour][emploi.heure]) {
+          acc[emploi.nomsecteur][emploi.jour][emploi.heure] = {};
         }
-        emploisOrganises[emploi.nomsecteur][emploi.jour][
-          emploi.idparcelle
-        ].push({
-          heure: emploi.heure,
-          idGardien: emploi.idgardien,
-        });
-      });
-
-      setEmplois(emploisOrganises);
+        acc[emploi.nomsecteur][emploi.jour][emploi.heure][emploi.idparcelle] =
+          emploi.idgardien;
+        return acc;
+      }, {});
+      setEmplois(groupedEmplois);
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des emplois :",
@@ -50,61 +40,75 @@ function Emploidutempcommun() {
     }
   };
 
-  // Fonction pour ajouter un emploi commun
+  // Add emploi commun
   const addEmploi = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/emplois-commun", formData);
-      alert("Emploi ajouté avec succès !");
-      fetchEmplois(); // Rafraîchir la liste des emplois
+      const response = await axios.post(
+        "http://localhost:5000/api/emplois-commun",
+        formData
+      );
+      alert(response.data.message);
       setFormData({
-        jour: "Lundi",
-        heure: "08:00",
+        jour: "",
+        heure: "",
         idParcelle: "",
         idSecteur: "",
         idGardien: "",
       });
+      fetchEmplois();
     } catch (error) {
-      console.error("Erreur lors de l'ajout de l'emploi :", error.message);
+      if (error.response && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        console.error("Erreur lors de l'ajout de l'emploi :", error.message);
+      }
     }
   };
 
-  // Mettre à jour les champs du formulaire
+  // Handle form change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Charger les emplois au premier rendu
+  // Load emplois on mount
   useEffect(() => {
     fetchEmplois();
   }, []);
 
   return (
     <div>
-      <h1>Emploi du Temps Commun</h1>
+      <h1>Gestion des Emplois Commun</h1>
 
-      {/* Formulaire pour ajouter un emploi */}
+      {/* Form */}
       <form onSubmit={addEmploi} style={{ marginBottom: "20px" }}>
         <select
           name="jour"
           value={formData.jour}
           onChange={handleChange}
           required
+          style={{ marginRight: "10px", padding: "5px" }}
         >
+          <option value="" disabled>
+            Sélectionnez un jour
+          </option>
           <option value="Lundi">Lundi</option>
           <option value="Mardi">Mardi</option>
           <option value="Mercredi">Mercredi</option>
           <option value="Jeudi">Jeudi</option>
           <option value="Vendredi">Vendredi</option>
+          <option value="Samedi">Samedi</option>
+          <option value="Dimanche">Dimanche</option>
         </select>
         <input
           type="time"
           name="heure"
+          placeholder="Heure"
           value={formData.heure}
           onChange={handleChange}
           required
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "5px" }}
         />
         <input
           type="number"
@@ -113,7 +117,7 @@ function Emploidutempcommun() {
           value={formData.idParcelle}
           onChange={handleChange}
           required
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "5px" }}
         />
         <input
           type="number"
@@ -122,7 +126,7 @@ function Emploidutempcommun() {
           value={formData.idSecteur}
           onChange={handleChange}
           required
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "5px" }}
         />
         <input
           type="text"
@@ -131,56 +135,55 @@ function Emploidutempcommun() {
           value={formData.idGardien}
           onChange={handleChange}
           required
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "5px" }}
         />
-        <button type="submit">Ajouter</button>
+        <button type="submit" style={{ padding: "5px 10px" }}>
+          Ajouter
+        </button>
       </form>
 
-      {/* Affichage des emplois */}
+      {/* Display emplois */}
+      <h2>Emploi Commun</h2>
       {emplois && Object.keys(emplois).length > 0 ? (
         Object.keys(emplois).map((secteur) => (
           <div key={secteur} style={{ marginBottom: "20px" }}>
-            <h2>Secteur {secteur}</h2>
+            <h3>Secteur : {secteur}</h3>
             {Object.keys(emplois[secteur]).map((jour) => (
-              <div key={jour} style={{ marginBottom: "10px" }}>
-                <h3>{jour}</h3>
+              <div key={jour}>
+                <h4>Jour : {jour}</h4>
                 <table
                   border="1"
-                  style={{ width: "100%", borderCollapse: "collapse" }}
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginBottom: "20px",
+                  }}
                 >
                   <thead>
                     <tr>
                       <th>Heure</th>
-                      {Object.keys(emplois[secteur][jour]).map((parcelle) => (
+                      {Object.keys(
+                        emplois[secteur][jour][
+                          Object.keys(emplois[secteur][jour])[0]
+                        ] || {}
+                      ).map((parcelle) => (
                         <th key={parcelle}>Parcelle {parcelle}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {[...Array(4)].map((_, i) => {
-                      const hour = 8 + i; // Heures de 08h à 12h
-                      const formattedHour = `${hour}:00-${hour + 1}:00`;
-                      return (
-                        <tr key={i}>
-                          <td>{formattedHour}</td>
-                          {Object.keys(emplois[secteur][jour]).map(
-                            (parcelle) => {
-                              const emploi = emplois[secteur][jour][
-                                parcelle
-                              ].find((e) => e.heure === `${hour}:00:00`);
-                              return (
-                                <td
-                                  key={parcelle}
-                                  style={{ textAlign: "center" }}
-                                >
-                                  {emploi ? emploi.idGardien : ""}
-                                </td>
-                              );
-                            }
-                          )}
-                        </tr>
-                      );
-                    })}
+                    {Object.keys(emplois[secteur][jour]).map((heure) => (
+                      <tr key={heure}>
+                        <td>{heure}</td>
+                        {Object.keys(emplois[secteur][jour][heure] || {}).map(
+                          (parcelle) => (
+                            <td key={parcelle}>
+                              {emplois[secteur][jour][heure][parcelle]}
+                            </td>
+                          )
+                        )}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -188,7 +191,7 @@ function Emploidutempcommun() {
           </div>
         ))
       ) : (
-        <p>Aucun emploi disponible</p>
+        <p>Aucun emploi commun disponible</p>
       )}
     </div>
   );

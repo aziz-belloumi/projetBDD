@@ -214,25 +214,49 @@ app.get("/api/parcelles", async (req, res) => {
 app.post("/api/emplois-commun", async (req, res) => {
   const { jour, heure, idParcelle, idSecteur, idGardien } = req.body;
 
+  // Vérification des champs requis
   if (!jour || !heure || !idParcelle || !idSecteur || !idGardien) {
     return res.status(400).json({ message: "Tous les champs sont requis." });
   }
 
   try {
-    // Vérifier si un autre gardien travaille dans la même parcelle au même moment
-    const checkQuery = `
-      SELECT * FROM EmploiDuTemps
-      WHERE Jour = $1 AND Heure = $2 AND IDParcelle = $3
+    // Vérifier si le gardien est déjà assigné à un autre secteur le même jour
+    const checkSecteurQuery = `
+      SELECT DISTINCT idsecteur 
+      FROM EmploiDuTemps
+      WHERE jour = $1 AND idgardien = $2
     `;
-    const checkResult = await db.query(checkQuery, [jour, heure, idParcelle]);
+    const secteurResult = await db.query(checkSecteurQuery, [jour, idGardien]);
 
-    if (checkResult.rows.length > 0) {
+    if (
+      secteurResult.rows.length > 0 &&
+      parseInt(secteurResult.rows[0].idsecteur) !== parseInt(idSecteur)
+    ) {
       return res.status(400).json({
-        message:
-          "Un autre gardien travaille déjà dans cette parcelle à cette heure.",
+        message: `Le gardien est déjà assigné au secteur ${secteurResult.rows[0].idsecteur} pour ce jour (${jour}).`,
       });
     }
 
+    // Vérifier si le gardien est assigné à une autre parcelle à la même heure
+    const checkParcelleQuery = `
+      SELECT * 
+      FROM EmploiDuTemps
+      WHERE jour = $1 AND heure = $2 AND idgardien = $3
+    `;
+    const parcelleResult = await db.query(checkParcelleQuery, [
+      jour,
+      heure,
+      idGardien,
+    ]);
+
+    if (parcelleResult.rows.length > 0) {
+      return res.status(400).json({
+        message:
+          "Le gardien est déjà assigné à une autre parcelle à cette heure.",
+      });
+    }
+
+    // Insérer les données si les validations sont respectées
     const query = `
       INSERT INTO EmploiDuTemps (Jour, Heure, IDParcelle, IDSecteur, IDGardien)
       VALUES ($1, $2, $3, $4, $5)
@@ -247,7 +271,7 @@ app.post("/api/emplois-commun", async (req, res) => {
     ]);
 
     res.status(201).json({
-      message: "Emploi commun ajouté avec succès",
+      message: "Emploi ajouté avec succès",
       emploi: result.rows[0],
     });
   } catch (err) {
@@ -256,7 +280,6 @@ app.post("/api/emplois-commun", async (req, res) => {
   }
 });
 
-// Get emplois commun
 app.get("/api/emplois-commun", async (req, res) => {
   try {
     const query = `
@@ -267,43 +290,38 @@ app.get("/api/emplois-commun", async (req, res) => {
       ORDER BY e.jour, e.heure;
     `;
     const result = await db.query(query);
-    res.status(200).json(result.rows); // Vérifiez ici si `result.rows` contient bien `idgardien`
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error("Erreur SQL :", err.message);
     res.status(500).json({ message: "Erreur serveur", error: err.message });
   }
 });
-//emploi idiv
 
+//indiv
 // Route pour récupérer l'emploi du temps d'un gardien
-app.get("/emplois-du-temps", async (req, res) => {
+app.get("/api/emplois-tous-gardiens", async (req, res) => {
   try {
-    const result = await db.query(`
+    const query = `
       SELECT 
-          e.IDGardien,
-          emp.Nom || ' ' || emp.Prenom AS NomGardien,
-          e.Jour,
-          s.NomSecteur,
-          STRING_AGG(p.IDParcelle::VARCHAR, ' - ') AS Parcelles
-      FROM 
-          EmploiDuTemps e
-      JOIN 
-          Parcelle p ON e.IDParcelle = p.IDParcelle
-      JOIN 
-          Secteur s ON e.IDSecteur = s.IDSecteur
-      JOIN 
-          Employe emp ON e.IDGardien = emp.IDEmploye
-      GROUP BY 
-          e.IDGardien, emp.Nom, emp.Prenom, e.Jour, s.NomSecteur
-      ORDER BY 
-          e.IDGardien, e.Jour;
-    `);
-    res.json(result.rows);
+        e.idgardien, 
+        em.nom AS nomgardien, 
+        em.prenom AS prenomgardien, 
+        e.jour, 
+        s.nomsecteur, 
+        ARRAY_AGG(p.idparcelle ORDER BY e.heure) AS parcelles
+      FROM EmploiDuTemps e
+      JOIN Parcelle p ON e.idparcelle = p.idparcelle
+      JOIN Secteur s ON e.idsecteur = s.idsecteur
+      JOIN Employe em ON e.idgardien = em.idemploye
+      GROUP BY e.idgardien, em.nom, em.prenom, e.jour, s.nomsecteur
+      ORDER BY e.idgardien, e.jour;
+    `;
+
+    const result = await db.query(query);
+    res.status(200).json(result.rows);
   } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ error: "Erreur lors de la récupération des emplois du temps." });
+    console.error("Erreur SQL :", err.message);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
   }
 });
 
@@ -340,6 +358,8 @@ app.get("/api/animals", (req, res) => {
 
 // Create a new animal
 app.post("/api/animals", (req, res) => {
+  console.log("Incoming Data:", req.body);
+
   const {
     idanimal,
     nom,
@@ -353,11 +373,12 @@ app.post("/api/animals", (req, res) => {
     idparent2,
   } = req.body;
 
+  // Handle missing optional fields by setting them to null
   const query = `
     INSERT INTO animal (
       idanimal, nom, idespece, datenaissance, poids, taille, groupesanguin, datedeces, idparent1, idparent2
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *;
+    RETURNING *;  -- Return the inserted row
   `;
 
   db.query(
@@ -366,18 +387,18 @@ app.post("/api/animals", (req, res) => {
       idanimal,
       nom,
       idespece,
-      datenaissance,
-      poids,
-      taille,
-      groupesanguin,
-      datedeces,
-      idparent1,
-      idparent2,
+      datenaissance || null, // If datenaissance is not provided, set it to null
+      poids || null, // If poids is not provided, set it to null
+      taille || null, // If taille is not provided, set it to null
+      groupesanguin || null, // If groupesanguin is not provided, set it to null
+      datedeces || null, // If datedeces is not provided, set it to null
+      idparent1 || null, // If idparent1 is not provided, set it to null
+      idparent2 || null, // If idparent2 is not provided, set it to null
     ],
     (err, result) => {
       if (err) {
-        console.error("Error adding animal:", err.message);
-        return res.status(500).json({ error: "Failed to add animal." });
+        console.error("Error executing query:", err.message);
+        return res.status(500).json({ error: err.message });
       }
       res.json({
         message: "Animal added successfully!",
@@ -386,7 +407,6 @@ app.post("/api/animals", (req, res) => {
     }
   );
 });
-
 // get all species
 app.get("/api/especes", (req, res) => {
   const query = `
@@ -427,6 +447,48 @@ app.post("/api/especes", (req, res) => {
       result: result.rows[0],
     });
   });
+});
+//services
+// ------------------ Service ------------------
+// Route GET pour récupérer les services
+app.get("/api/services", async (req, res) => {
+  try {
+    const query = "SELECT * FROM Service ORDER BY IDService";
+    const result = await db.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des services :", err.message);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
+});
+
+// Route POST pour ajouter un service
+app.post("/api/services", async (req, res) => {
+  const { idservice, nomservice } = req.body;
+
+  // Vérification des champs requis
+  if (!idservice || !nomservice) {
+    return res
+      .status(400)
+      .json({ message: "ID Service et Nom du Service sont requis." });
+  }
+
+  try {
+    const query = `
+      INSERT INTO Service (IDService, NomService) 
+      VALUES ($1, $2) 
+      RETURNING *;
+    `;
+    const result = await db.query(query, [idservice, nomservice]);
+
+    res.status(201).json({
+      message: "Service ajouté avec succès",
+      service: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Erreur lors de l'ajout du service :", err.message);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 });
 
 // Start Server

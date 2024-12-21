@@ -167,14 +167,22 @@ function Employees() {
           value={formData.grade}
           onChange={handleChange}
         />
-        <input
-          type="text"
+        <select
           name="role"
-          placeholder="Rôle"
           value={formData.role}
           onChange={handleChange}
           required
-        />
+        >
+          <option value="">Sélectionner un rôle</option>
+          <option value="Vétérinaire">Vétérinaire</option>
+          <option value="Infirmier">Infirmier</option>
+          <option value="Gardien">Gardien</option>
+          <option value="ChefDeSecteur">Chef De Secteur</option>
+          <option value="Secrétaire">Secrétaire</option>
+          <option value="Comptable">Comptable</option>
+          <option value="ChefDuPersonnel">Chef Du Personnel</option>
+          <option value="Directeur">Directeur</option>
+        </select>
         <button type="submit">Ajouter</button>
       </form>
 
