@@ -13,7 +13,7 @@ app.use(express.json());
 const db = new Client({
   host: "localhost",
   user: "postgres", // Update with your PostgreSQL username
-  password: "fedikh09", // Update with your PostgreSQL password
+  password: "aziz1234", // Update with your PostgreSQL password
   database: "zoo", // Your PostgreSQL database name
 });
 

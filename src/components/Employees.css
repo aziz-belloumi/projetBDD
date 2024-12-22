@@ -1,0 +1,98 @@
+/* General styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .title {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2em;
+  }
+  
+  /* Form styles */
+  .form-container {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
+  
+  .form-title {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .form-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+  }
+  
+  .form-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  .submit-button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Table styles */
+  .table-container {
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    width: 100vw; /* Ensure container takes the full width of the viewport */
+    margin-left: -240px; /* Offset the form's container margin to span the full width */
+  }
+  .table th {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: #555;
+  }
+  
+  .table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
