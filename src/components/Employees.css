@@ -3,6 +3,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    height: 100%;
   }
   
   .title {
@@ -18,7 +19,18 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
+   
+
   }
+  .form-container1 {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 130px;
+   
+  }
+
   
   .form-title {
     color: #34495e;
@@ -70,29 +82,44 @@
     background-color: #2980b9;
   }
   
-  /* Table styles */
   .table-container {
     background: white;
-    border-radius: 2px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
-    width: 100vw; /* Ensure container takes the full width of the viewport */
-    margin-left: -240px; /* Offset the form's container margin to span the full width */
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
   }
+ 
+  .table {
+    width: 100%;
+    border-collapse: collapse; /* Fusionner les bordures */
+    margin-top: 20px;
+  }
+  
+  .table th, .table td {
+    border: 1px solid #ddd; /* Bordure légère autour de chaque cellule */
+    padding: 12px;
+    text-align: center;
+  }
+  
   .table th {
     background-color: #f8f9fa;
     color: #2c3e50;
     font-weight: 600;
     text-align: center;
-    border-bottom: 2px solid #ddd;
-  }
-  
-  .table td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    color: #555;
   }
   
   .table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: #f1f1f1;
   }
+  .sector-title {
+    text-align: left;
+    color: #3498db;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  

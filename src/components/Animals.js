@@ -112,175 +112,204 @@ function Animals() {
 
   return (
     <div>
-      <h1>Animals and Species Management</h1>
+      <h1>Gestion des Animaux et des Espèces</h1>
 
       {/* Form to add a new species */}
-      <h2>Add a New Species</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          addSpecies();
-        }}
-      >
-        <input
-          type="text"
-          name="idespece"
-          placeholder="Species ID"
-          value={speciesFormData.idespece}
-          onChange={handleSpeciesChange}
-          required
-        />
-        <input
-          type="text"
-          name="nomespece"
-          placeholder="Species Name"
-          value={speciesFormData.nomespece}
-          onChange={handleSpeciesChange}
-          required
-        />
-        <select
-          name="classification"
-          value={speciesFormData.classification}
-          onChange={handleSpeciesChange}
-          required
+
+      <div className="form-container">
+        <h2 className="form-title">Ajouter une Espèce</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            addSpecies();
+          }}
+          className="form-grid"
         >
-          <option value="">Select Classification</option>
-          <option value="Individu">Individu</option>
-          <option value="Groupe">Groupe</option>
-        </select>
-        <button type="submit">Add Species</button>
-      </form>
+          <input
+            type="text"
+            name="idespece"
+            placeholder="ID Espèce"
+            value={speciesFormData.idespece}
+            onChange={handleSpeciesChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            name="nomespece"
+            placeholder="Nom de l'Espèce"
+            value={speciesFormData.nomespece}
+            onChange={handleSpeciesChange}
+            className="form-input"
+            required
+          />
+          <select
+            name="classification"
+            value={speciesFormData.classification}
+            onChange={handleSpeciesChange}
+            className="form-input"
+            required
+          >
+            <option value="">Sélectionner une Classification</option>
+            <option value="Individu">Individu</option>
+            <option value="Groupe">Groupe</option>
+          </select>
+          <button type="submit" className="submit-button">
+            Ajouter l'Espèce
+          </button>
+        </form>
+      </div>
 
       {/* Form to add a new animal */}
-      <h2>Add a New Animal</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          addAnimal();
-        }}
-      >
-        <input
-          type="text"
-          name="idanimal"
-          placeholder="Animal ID"
-          value={animalFormData.idanimal}
-          onChange={handleAnimalChange}
-          required
-        />
-        <input
-          type="text"
-          name="nom"
-          placeholder="Animal Name"
-          value={animalFormData.nom}
-          onChange={handleAnimalChange}
-          required
-        />
-        <select
-          name="idespece"
-          value={animalFormData.idespece}
-          onChange={handleAnimalChange}
-          required
+
+      <div className="form-container">
+        <h2 className="form-title">Ajouter un Animal</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            addAnimal();
+          }}
+          className="form-grid"
         >
-          <option value="">Select Species</option>
-          {species.map((sp) => (
-            <option key={sp.idespece} value={sp.idespece}>
-              {sp.nomespece}
-            </option>
-          ))}
-        </select>
-        <input
-          type="date"
-          name="datenaissance"
-          value={animalFormData.datenaissance}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="number"
-          name="poids"
-          placeholder="Weight"
-          value={animalFormData.poids}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="number"
-          name="taille"
-          placeholder="Height"
-          value={animalFormData.taille}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="text"
-          name="groupesanguin"
-          placeholder="Blood Group"
-          value={animalFormData.groupesanguin}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="date"
-          name="datedeces"
-          value={animalFormData.datedeces}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="text"
-          name="idparent1"
-          placeholder="Parent1 ID"
-          value={animalFormData.idparent1}
-          onChange={handleAnimalChange}
-        />
-        <input
-          type="text"
-          name="idparent2"
-          placeholder="Parent2 ID"
-          value={animalFormData.idparent2}
-          onChange={handleAnimalChange}
-        />
-        <button type="submit">Add Animal</button>
-      </form>
+          <input
+            type="text"
+            name="idanimal"
+            placeholder="ID Animal"
+            value={animalFormData.idanimal}
+            onChange={handleAnimalChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            name="nom"
+            placeholder="Nom de l'Animal"
+            value={animalFormData.nom}
+            onChange={handleAnimalChange}
+            className="form-input"
+            required
+          />
+          <select
+            name="idespece"
+            value={animalFormData.idespece}
+            onChange={handleAnimalChange}
+            className="form-input"
+            required
+          >
+            <option value="">Sélectionner une Espèce</option>
+            {species.map((sp) => (
+              <option key={sp.idespece} value={sp.idespece}>
+                {sp.nomespece}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            name="datenaissance"
+            value={animalFormData.datenaissance}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="number"
+            name="poids"
+            placeholder="Poids"
+            value={animalFormData.poids}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="number"
+            name="taille"
+            placeholder="Taille"
+            value={animalFormData.taille}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="text"
+            name="groupesanguin"
+            placeholder="Groupe Sanguin"
+            value={animalFormData.groupesanguin}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="date"
+            name="datedeces"
+            value={animalFormData.datedeces}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="text"
+            name="idparent1"
+            placeholder="ID Parent 1"
+            value={animalFormData.idparent1}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <input
+            type="text"
+            name="idparent2"
+            placeholder="ID Parent 2"
+            value={animalFormData.idparent2}
+            onChange={handleAnimalChange}
+            className="form-input"
+          />
+          <button type="submit" className="submit-button">
+            Ajouter l'Animal
+          </button>
+        </form>
+      </div>
 
-      {/* Display species */}
-      <h2>Species List</h2>
-      <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            {species.length > 0 &&
-              Object.keys(species[0]).map((key) => (
-                <th key={key}>{key.toUpperCase()}</th>
-              ))}
-          </tr>
-        </thead>
-        <tbody>
-          {species.map((sp) => (
-            <tr key={sp.idespece}>
-              {Object.values(sp).map((value, index) => (
-                <td key={index}>{value || "N/A"}</td>
-              ))}
+      {/* Tableau Espèces */}
+      <div className="form-container">
+        <h2 className="form-title">Liste des Espèces</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              {species.length > 0 &&
+                Object.keys(species[0]).map((key) => (
+                  <th key={key}>{key.toUpperCase()}</th>
+                ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {species.map((sp) => (
+              <tr key={sp.idespece}>
+                {Object.values(sp).map((value, index) => (
+                  <td key={index}>{value || "N/A"}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Display animals */}
-      <h2>Animal List</h2>
-      <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            {animals.length > 0 &&
-              Object.keys(animals[0]).map((key) => (
-                <th key={key}>{key.toUpperCase()}</th>
-              ))}
-          </tr>
-        </thead>
-        <tbody>
-          {animals.map((animal) => (
-            <tr key={animal.idanimal}>
-              {Object.values(animal).map((value, index) => (
-                <td key={index}>{value || "N/A"}</td>
-              ))}
+      {/* Tableau Animaux */}
+      <div className="form-container">
+        <h2 className="form-title">Liste des Animaux</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              {animals.length > 0 &&
+                Object.keys(animals[0]).map((key) => (
+                  <th key={key}>{key.toUpperCase()}</th>
+                ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {animals.map((animal) => (
+              <tr key={animal.idanimal}>
+                {Object.values(animal).map((value, index) => (
+                  <td key={index}>{value || "N/A"}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

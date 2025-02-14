@@ -13,10 +13,9 @@ app.use(express.json());
 const db = new Client({
   host: "localhost",
   user: "postgres", // Update with your PostgreSQL username
-  password: "aziz1234", // Update with your PostgreSQL password
+  password: "fedikh09", // Update with your PostgreSQL password
   database: "zoo", // Your PostgreSQL database name
 });
-
 db.connect((err) => {
   if (err) throw err;
   console.log("Connected to PostgreSQL Database!");

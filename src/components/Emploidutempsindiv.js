@@ -42,22 +42,17 @@ function Emploidutempsindiv() {
   const groupedEmplois = groupByGardien(emplois);
 
   return (
-    <div>
-      <h1>Emplois du Temps de Tous les Gardiens</h1>
+    <div className="container">
+      <h1 className="title">Emplois du Temps de Tous les Gardiens</h1>
       {Object.keys(groupedEmplois).length > 0 ? (
         Object.entries(groupedEmplois).map(([gardienId, data]) => (
-          <div
-            key={gardienId}
-            style={{
-              border: "1px solid black",
-              padding: "10px",
-              marginBottom: "20px",
-            }}
-          >
-            <h2>Emploi du temps de : {data.nom}</h2>
-            <ul>
+          <div key={gardienId} className="form-container">
+            <h2 className="form-title" style={{ color: "#3498db" }}>
+              Emploi du temps de : {data.nom}
+            </h2>
+            <ul className="list-disc pl-5">
               {data.emplois.map((emploi, index) => (
-                <li key={index}>
+                <li key={index} className="mb-2">
                   <strong>{emploi.jour} :</strong> secteur {emploi.nomsecteur} :
                   parcelles {emploi.parcelles.join(" - ")}
                 </li>

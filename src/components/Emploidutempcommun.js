@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+
 function Emploidutempcommun() {
   const [emplois, setEmplois] = useState({});
   const [formData, setFormData] = useState({
@@ -79,120 +80,113 @@ function Emploidutempcommun() {
 
   return (
     <div>
-      <h1>Gestion des Emplois Commun</h1>
-
-      {/* Form */}
-      <form onSubmit={addEmploi} style={{ marginBottom: "20px" }}>
-        <select
-          name="jour"
-          value={formData.jour}
-          onChange={handleChange}
-          required
-          style={{ marginRight: "10px", padding: "5px" }}
-        >
-          <option value="" disabled>
-            Sélectionnez un jour
-          </option>
-          <option value="Lundi">Lundi</option>
-          <option value="Mardi">Mardi</option>
-          <option value="Mercredi">Mercredi</option>
-          <option value="Jeudi">Jeudi</option>
-          <option value="Vendredi">Vendredi</option>
-          <option value="Samedi">Samedi</option>
-          <option value="Dimanche">Dimanche</option>
-        </select>
-        <input
-          type="time"
-          name="heure"
-          placeholder="Heure"
-          value={formData.heure}
-          onChange={handleChange}
-          required
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <input
-          type="number"
-          name="idParcelle"
-          placeholder="ID Parcelle"
-          value={formData.idParcelle}
-          onChange={handleChange}
-          required
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <input
-          type="number"
-          name="idSecteur"
-          placeholder="ID Secteur"
-          value={formData.idSecteur}
-          onChange={handleChange}
-          required
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <input
-          type="text"
-          name="idGardien"
-          placeholder="ID Gardien"
-          value={formData.idGardien}
-          onChange={handleChange}
-          required
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <button type="submit" style={{ padding: "5px 10px" }}>
-          Ajouter
-        </button>
-      </form>
+      <div className="form-container">
+        <h2 className="form-title">Ajouter un Emploi Commun</h2>
+        <form onSubmit={addEmploi} className="form-grid">
+          <select
+            name="jour"
+            value={formData.jour}
+            onChange={handleChange}
+            className="form-input"
+            required
+          >
+            <option value="">Sélectionnez un jour</option>
+            <option value="Lundi">Lundi</option>
+            <option value="Mardi">Mardi</option>
+            <option value="Mercredi">Mercredi</option>
+            <option value="Jeudi">Jeudi</option>
+            <option value="Vendredi">Vendredi</option>
+            <option value="Samedi">Samedi</option>
+            <option value="Dimanche">Dimanche</option>
+          </select>
+          <input
+            type="time"
+            name="heure"
+            placeholder="Heure"
+            value={formData.heure}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="number"
+            name="idParcelle"
+            placeholder="ID Parcelle"
+            value={formData.idParcelle}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="number"
+            name="idSecteur"
+            placeholder="ID Secteur"
+            value={formData.idSecteur}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            name="idGardien"
+            placeholder="ID Gardien"
+            value={formData.idGardien}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+          <button type="submit" className="submit-button">
+            Ajouter
+          </button>
+        </form>
+      </div>
 
       {/* Display emplois */}
-      <h2>Emploi Commun</h2>
-      {emplois && Object.keys(emplois).length > 0 ? (
-        Object.keys(emplois).map((secteur) => (
-          <div key={secteur} style={{ marginBottom: "20px" }}>
-            <h3>Secteur : {secteur}</h3>
-            {Object.keys(emplois[secteur]).map((jour) => (
-              <div key={jour}>
-                <h4>Jour : {jour}</h4>
-                <table
-                  border="1"
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Heure</th>
-                      {Object.keys(
-                        emplois[secteur][jour][
-                          Object.keys(emplois[secteur][jour])[0]
-                        ] || {}
-                      ).map((parcelle) => (
-                        <th key={parcelle}>Parcelle {parcelle}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(emplois[secteur][jour]).map((heure) => (
-                      <tr key={heure}>
-                        <td>{heure}</td>
-                        {Object.keys(emplois[secteur][jour][heure] || {}).map(
-                          (parcelle) => (
-                            <td key={parcelle}>
-                              {emplois[secteur][jour][heure][parcelle]}
-                            </td>
-                          )
-                        )}
+      <div className="form-container">
+        <h2 className="form-title">Emploi Commun</h2>
+        {emplois && Object.keys(emplois).length > 0 ? (
+          Object.keys(emplois).map((secteur) => (
+            <div key={secteur} className="sector-section">
+              <h3 className="sector-title ">Secteur : {secteur}</h3>
+              {Object.keys(emplois[secteur]).map((jour) => (
+                <div key={jour} className="day-section">
+                  <h4 className="day-title">Jour : {jour}</h4>
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Heure</th>
+                        {Object.keys(
+                          emplois[secteur][jour][
+                            Object.keys(emplois[secteur][jour])[0]
+                          ] || {}
+                        ).map((parcelle) => (
+                          <th key={parcelle}>Parcelle {parcelle}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </div>
-        ))
-      ) : (
-        <p>Aucun emploi commun disponible</p>
-      )}
+                    </thead>
+                    <tbody>
+                      {Object.keys(emplois[secteur][jour]).map((heure) => (
+                        <tr key={heure}>
+                          <td>{heure}</td>
+                          {Object.keys(emplois[secteur][jour][heure] || {}).map(
+                            (parcelle) => (
+                              <td key={parcelle}>
+                                {emplois[secteur][jour][heure][parcelle]}
+                              </td>
+                            )
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          ))
+        ) : (
+          <p>Aucun emploi commun disponible</p>
+        )}
+      </div>
     </div>
   );
 }
